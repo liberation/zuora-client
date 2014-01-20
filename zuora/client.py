@@ -22,4 +22,6 @@ class Zuora(object):
     """
 
     def __init__(self, wsdl, login, password):
-        pass
+        self.wsdl = wsdl
+        self.login = login
+        self.password = password
