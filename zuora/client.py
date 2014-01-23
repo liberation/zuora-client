@@ -37,5 +37,26 @@ class Zuora(object):
             self.wsdl_path,
             transport=HttpTransportWithKeepAlive())
 
+    def instanciate(self, instance_type_string):
+        """
+        Create object for client.factory.
+        """
+        return self.client.factory.create(instance_type_string)
+
     def __str__(self):
+        """
+        Display the client __str__ method.
+        """
         return self.client.__str__()
+
+# amend(AmendRequest[] requests, )
+# create(ns2:zObject[] zObjects, )
+# delete(xs:string type, ID[] ids, )
+# execute(xs:string type, xs:boolean synchronous, ID[] ids, )
+# generate(ns2:zObject[] zObjects, )
+# getUserInfo()
+# login(xs:string username, xs:string password, )
+# query(xs:string queryString, )
+# queryMore(QueryLocator queryLocator, )
+# subscribe(SubscribeRequest[] subscribes, )
+# update(ns2:zObject[] zObjects, )
