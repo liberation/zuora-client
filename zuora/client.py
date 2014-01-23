@@ -5,6 +5,8 @@ Client for Zuora SOAP API
 #  - Handle debug
 #  - Handle error
 #  - Session policy
+import os
+
 from suds.client import Client
 from suds.sax.element import Element
 
