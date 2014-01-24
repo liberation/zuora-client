@@ -37,6 +37,24 @@ class Zuora(object):
             self.wsdl_path,
             transport=HttpTransportWithKeepAlive())
 
+    def login(self):
+        """
+        Login on the API to get a session.
+        """
+        response = self.client.service.login(self.login, self.password)
+        self.set_session(response.Session)
+
+    def set_session(self, session_id):
+        """
+        Record the session info.
+        """
+        self.session = session_id
+        session_namespace = ('ns1', 'http://api.zuora.com/')
+        session = Element('session', ns=session_namespace).setText(session_id)
+        header = Element('SessionHeader', ns=session_namespace)
+        header.append(session)
+        self.client.set_options(soapheaders=[header])
+
     def instanciate(self, instance_type_string):
         """
         Create object for client.factory.
