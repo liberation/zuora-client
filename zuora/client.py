@@ -43,6 +43,7 @@ class Zuora(object):
         """
         response = self.client.service.login(self.login, self.password)
         self.set_session(response.Session)
+        return response
 
     def set_session(self, session_id):
         """
