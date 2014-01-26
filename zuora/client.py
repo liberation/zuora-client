@@ -37,6 +37,12 @@ class Zuora(object):
             self.wsdl_path,
             transport=HttpTransportWithKeepAlive())
 
+    def call(self, method, *args, **kwargs):
+        """
+        Call a SOAP method.
+        """
+        return method(*args, **kwargs)
+
     def login(self):
         """
         Login on the API to get a session.
