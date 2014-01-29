@@ -37,19 +37,11 @@ class Zuora(object):
             self.wsdl_path,
             transport=HttpTransportWithKeepAlive())
 
-    def call(self, method, *args, **kwargs):
+    def instanciate(self, instance_type_string):
         """
-        Call a SOAP method.
+        Create object for client.factory.
         """
-        return method(*args, **kwargs)
-
-    def login(self):
-        """
-        Login on the API to get a session.
-        """
-        response = self.client.service.login(self.login, self.password)
-        self.set_session(response.Session)
-        return response
+        return self.client.factory.create(instance_type_string)
 
     def set_session(self, session_id):
         """
@@ -62,11 +54,108 @@ class Zuora(object):
         header.append(session)
         self.client.set_options(soapheaders=[header])
 
-    def instanciate(self, instance_type_string):
+    def call(self, method, *args, **kwargs):
         """
-        Create object for client.factory.
+        Call a SOAP method.
         """
-        return self.client.factory.create(instance_type_string)
+        return method(*args, **kwargs)
+
+    def amend(self, *amend_requests):
+        """
+        Amend susbcriptions.
+        """
+        response = self.call(
+            self.client.service.amend,
+            *amend_requests)
+        return response
+
+    def create(self, *z_objects):
+        """
+        Create z_objects.
+        """
+        response = self.call(
+            self.client.service.create,
+            *z_objects)
+        return response
+
+    def delete(self, object_string, ids=[]):
+        """
+        Delete z_objects by ID.
+        """
+        response = self.call(
+            self.client.service.delete,
+            object_string, ids)
+        return response
+
+    def execute(self, object_string, synchronous=False, ids=[]):
+        """
+        Execute a process by IDs.
+        """
+        response = self.call(
+            self.client.service.execute,
+            object_string, synchronous, ids)
+        return response
+
+    def generate(self, *z_objects):
+        """
+        Generate z_objects.
+        """
+        response = self.call(
+            self.client.service.execute,
+            *z_objects)
+        return response
+
+    def get_user_info(self):
+        """
+        Return current user's info.
+        """
+        response = self.call(
+            self.client.service.get_user_info)
+        return response
+
+    def login(self):
+        """
+        Login on the API to get a session.
+        """
+        response = self.client.service.login(self.login, self.password)
+        self.set_session(response.Session)
+        return response
+
+    def query(self, query_string):
+        """
+        Execute a query.
+        """
+        response = self.call(
+            self.client.service.query,
+            query_string)
+        return response
+
+    def query_more(self, query_locator):
+        """
+        Execute the suite of a query.
+        """
+        response = self.call(
+            self.client.service.queryMore,
+            query_locator)
+        return response
+
+    def subscribe(self, *subscribe_requests):
+        """
+        Subscribe accounts.
+        """
+        response = self.call(
+            self.client.service.subscribe,
+            *subscribe_requests)
+        return response
+
+    def update(self, *z_objects):
+        """
+        Update z_objects.
+        """
+        response = self.call(
+            self.client.service.update,
+            *z_objects)
+        return response
 
     def __str__(self):
         """
@@ -74,14 +163,3 @@ class Zuora(object):
         """
         return self.client.__str__()
 
-# amend(AmendRequest[] requests, )
-# create(ns2:zObject[] zObjects, )
-# delete(xs:string type, ID[] ids, )
-# execute(xs:string type, xs:boolean synchronous, ID[] ids, )
-# generate(ns2:zObject[] zObjects, )
-# getUserInfo()
-# login(xs:string username, xs:string password, )
-# query(xs:string queryString, )
-# queryMore(QueryLocator queryLocator, )
-# subscribe(SubscribeRequest[] subscribes, )
-# update(ns2:zObject[] zObjects, )
