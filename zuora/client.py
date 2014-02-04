@@ -5,6 +5,7 @@ import os
 import logging
 from datetime import datetime
 from datetime import timedelta
+from ConfigParser import SafeConfigParser
 
 from suds import WebFault
 from suds.client import Client
@@ -25,7 +26,7 @@ class ZuoraException(Exception):
     pass
 
 
-class Zuora(object):
+class BaseZuora(object):
     """
     SOAP Client based on Suds
     """
@@ -203,3 +204,25 @@ class Zuora(object):
         Display the client __str__ method.
         """
         return self.client.__str__()
+
+
+class Zuora(BaseZuora):
+    """
+    Final SOAP Zuora Client
+    """
+
+    def __init__(self):
+        default_config = {'session_duration': str(DEFAULT_SESSION_DURATION)}
+
+        config = SafeConfigParser(default_config)
+        config.add_section('client')
+        config.read([os.path.expanduser('~/.zuora.cfg'),
+                     os.path.join(os.getcwd(), 'etc/zuora.cfg')])
+
+        wsdl = config.get('client', 'wsdl')
+        login = config.get('client', 'login')
+        password = config.get('client', 'password')
+        session_duration = config.getint('client', 'session_duration')
+
+        super(Zuora, self).__init__(
+            wsdl, login, password, session_duration)
