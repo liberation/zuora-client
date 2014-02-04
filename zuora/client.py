@@ -6,11 +6,17 @@ Client for Zuora SOAP API
 #  - Handle error
 #  - Session policy
 import os
+from datetime import datetime
+from datetime import timedelta
 
+from suds import WebFault
 from suds.client import Client
+from suds.sax.text import Text
 from suds.sax.element import Element
 
 from zuora.transport import HttpTransportWithKeepAlive
+
+DEFAULT_SESSION_DURATION = 15 * 60
 
 
 class ZuoraException(Exception):
@@ -25,12 +31,15 @@ class Zuora(object):
     SOAP Client based on Suds
     """
 
-    def __init__(self, wsdl, login, password):
+    def __init__(self, wsdl, login, password,
+                 session_duration=DEFAULT_SESSION_DURATION):
         self.wsdl = wsdl
         self.login = login
         self.password = password
 
         self.session = None
+        self.session_duration = session_duration
+        self.session_expiration = datetime.now()
         self.wsdl_path = 'file://%s' % os.path.abspath(self.wsdl)
 
         self.client = Client(
@@ -48,6 +57,8 @@ class Zuora(object):
         Record the session info.
         """
         self.session = session_id
+        self.session_expiration = datetime.now() + timedelta(
+            seconds=self.session_duration)
         session_namespace = ('ns1', 'http://api.zuora.com/')
         session = Element('session', ns=session_namespace).setText(session_id)
         header = Element('SessionHeader', ns=session_namespace)
@@ -65,7 +76,24 @@ class Zuora(object):
         """
         Call a SOAP method.
         """
-        return method(*args, **kwargs)
+        if self.session is None or self.session_expiration >= datetime.now():
+            self.login()
+
+        try:
+            response = method(*args, **kwargs)
+            if isinstance(response, Text):  # Occasionally happens
+                self.reset()
+                return self.call(method, *args, **kwargs)
+        except WebFault as error:
+            if error.fault.faultcode == 'fns:INVALID_SESSION':
+                self.reset()
+                return self.call(method, *args, **kwargs)
+            else:
+                raise ZuoraException('WebFault: %s' % error.__dict__)
+        except Exception as error:
+            raise ZuoraException('Unexpected error: %s' % error)
+
+        return response
 
     def amend(self, *amend_requests):
         """
