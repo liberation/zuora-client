@@ -54,6 +54,13 @@ class Zuora(object):
         header.append(session)
         self.client.set_options(soapheaders=[header])
 
+    def reset(self):
+        """
+        Reset the connection to the API.
+        """
+        self.session = None
+        self.client.options.transport = HttpTransportWithKeepAlive()
+
     def call(self, method, *args, **kwargs):
         """
         Call a SOAP method.
@@ -162,4 +169,3 @@ class Zuora(object):
         Display the client __str__ method.
         """
         return self.client.__str__()
-
