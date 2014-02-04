@@ -1,11 +1,8 @@
 """
 Client for Zuora SOAP API
 """
-# TODO:
-#  - Handle debug
-#  - Handle error
-#  - Session policy
 import os
+import logging
 from datetime import datetime
 from datetime import timedelta
 
@@ -17,6 +14,8 @@ from suds.sax.element import Element
 from zuora.transport import HttpTransportWithKeepAlive
 
 DEFAULT_SESSION_DURATION = 15 * 60
+
+logger = logging.getLogger(__name__)
 
 
 class ZuoraException(Exception):
@@ -81,18 +80,25 @@ class Zuora(object):
 
         try:
             response = method(*args, **kwargs)
+            logger.info('Sent: %s', self.client.last_sent())
+            logger.info('Received: %s', self.client.last_received())
             if isinstance(response, Text):  # Occasionally happens
+                logger.warning('Invalid response %s, retrying...', response)
                 self.reset()
                 return self.call(method, *args, **kwargs)
         except WebFault as error:
             if error.fault.faultcode == 'fns:INVALID_SESSION':
+                logger.warning('Invalid session, relogging...')
                 self.reset()
                 return self.call(method, *args, **kwargs)
             else:
+                logger.error('WebFault: %s', error.__dict__)
                 raise ZuoraException('WebFault: %s' % error.__dict__)
         except Exception as error:
+            logger.error('Unexpected error: %s', error)
             raise ZuoraException('Unexpected error: %s' % error)
 
+        logger.debug('Successful response %s', response)
         return response
 
     def amend(self, *amend_requests):
