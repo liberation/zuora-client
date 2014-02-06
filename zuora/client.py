@@ -17,6 +17,8 @@ from zuora.transport import HttpTransportWithKeepAlive
 DEFAULT_SESSION_DURATION = 15 * 60
 
 logger = logging.getLogger(__name__)
+logger_suds = logging.getLogger('suds')
+logger_suds.propagate = False
 
 
 class ZuoraException(Exception):
