@@ -31,10 +31,10 @@ class BaseZuora(object):
     SOAP Client based on Suds
     """
 
-    def __init__(self, wsdl, login, password,
+    def __init__(self, wsdl, username, password,
                  session_duration=DEFAULT_SESSION_DURATION):
         self.wsdl = wsdl
-        self.login = login
+        self.username = username
         self.password = password
 
         self.session = None
@@ -159,7 +159,7 @@ class BaseZuora(object):
         """
         Login on the API to get a session.
         """
-        response = self.client.service.login(self.login, self.password)
+        response = self.client.service.login(self.username, self.password)
         self.set_session(response.Session)
         return response
 
@@ -220,9 +220,9 @@ class Zuora(BaseZuora):
                      os.path.join(os.getcwd(), 'etc/zuora.cfg')])
 
         wsdl = config.get('client', 'wsdl')
-        login = config.get('client', 'login')
+        username = config.get('client', 'username')
         password = config.get('client', 'password')
         session_duration = config.getint('client', 'session_duration')
 
         super(Zuora, self).__init__(
-            wsdl, login, password, session_duration)
+            wsdl, username, password, session_duration)
