@@ -104,22 +104,22 @@ class BaseZuora(object):
         logger.debug('Successful response %s', response)
         return response
 
-    def amend(self, *amend_requests):
+    def amend(self, amend_requests):
         """
         Amend susbcriptions.
         """
         response = self.call(
             self.client.service.amend,
-            *amend_requests)
+            amend_requests)
         return response
 
-    def create(self, *z_objects):
+    def create(self, z_objects):
         """
         Create z_objects.
         """
         response = self.call(
             self.client.service.create,
-            *z_objects)
+            z_objects)
         return response
 
     def delete(self, object_string, ids=[]):
@@ -140,13 +140,13 @@ class BaseZuora(object):
             object_string, synchronous, ids)
         return response
 
-    def generate(self, *z_objects):
+    def generate(self, z_objects):
         """
         Generate z_objects.
         """
         response = self.call(
             self.client.service.execute,
-            *z_objects)
+            z_objects)
         return response
 
     def get_user_info(self):
@@ -183,22 +183,22 @@ class BaseZuora(object):
             query_locator)
         return response
 
-    def subscribe(self, *subscribe_requests):
+    def subscribe(self, subscribe_requests):
         """
         Subscribe accounts.
         """
         response = self.call(
             self.client.service.subscribe,
-            *subscribe_requests)
+            subscribe_requests)
         return response
 
-    def update(self, *z_objects):
+    def update(self, z_objects):
         """
         Update z_objects.
         """
         response = self.call(
             self.client.service.update,
-            *z_objects)
+            z_objects)
         return response
 
     def __str__(self):
