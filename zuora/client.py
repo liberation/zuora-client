@@ -95,9 +95,13 @@ class BaseZuora(object):
                 self.reset()
                 return self.call(method, *args, **kwargs)
             else:
+                logger.info('Sent: %s', self.client.last_sent())
+                logger.info('Received: %s', self.client.last_received())
                 logger.error('WebFault: %s', error.__dict__)
                 raise ZuoraException('WebFault: %s' % error.__dict__)
         except Exception as error:
+            logger.info('Sent: %s', self.client.last_sent())
+            logger.info('Received: %s', self.client.last_received())
             logger.error('Unexpected error: %s', error)
             raise ZuoraException('Unexpected error: %s' % error)
 
