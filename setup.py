@@ -28,7 +28,6 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules'],
 
     license=zuora.__license__,
-    include_package_data=True,
     zip_safe=False,
     install_requires=['suds>=0.4',
                       'httplib2>=0.8']

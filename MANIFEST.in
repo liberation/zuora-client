@@ -3,4 +3,5 @@ include LICENSE.txt
 include versions.cfg
 include buildout.cfg
 include bootstrap.py
-
+recursive-include etc *
+recursive-include wsdls *
