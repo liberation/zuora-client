@@ -15,6 +15,7 @@ from suds.sax.element import Element
 from zuora.transport import HttpTransportWithKeepAlive
 
 DEFAULT_SESSION_DURATION = 15 * 60
+DEFAULT_SESSION_NAMESPACE = 'http://api.zuora.com/'
 
 logger = logging.getLogger(__name__)
 logger_suds = logging.getLogger('suds')
@@ -34,13 +35,15 @@ class BaseZuora(object):
     """
 
     def __init__(self, wsdl, username, password,
-                 session_duration=DEFAULT_SESSION_DURATION):
+                 session_duration=DEFAULT_SESSION_DURATION,
+                 session_namespace=DEFAULT_SESSION_NAMESPACE):
         self.wsdl = wsdl
         self.username = username
         self.password = password
 
         self.session = None
         self.session_duration = session_duration
+        self.session_namespace = session_namespace
         self.session_expiration = datetime.now()
         self.wsdl_path = 'file://%s' % os.path.abspath(self.wsdl)
 
@@ -61,7 +64,7 @@ class BaseZuora(object):
         self.session = session_id
         self.session_expiration = datetime.now() + timedelta(
             seconds=self.session_duration)
-        session_namespace = ('ns1', 'http://api.zuora.com/')
+        session_namespace = ('ns1', self.session_namespace)
         session = Element('session', ns=session_namespace).setText(session_id)
         header = Element('SessionHeader', ns=session_namespace)
         header.append(session)
@@ -229,6 +232,9 @@ class Zuora(BaseZuora):
         username = config.get('client', 'username')
         password = config.get('client', 'password')
         session_duration = config.getint('client', 'session_duration')
+        ns = DEFAULT_SESSION_NAMESPACE
+        if config.has_option('client', 'namespace'):
+            ns = config.get('client', 'namespace')
 
         super(Zuora, self).__init__(
-            wsdl, username, password, session_duration)
+            wsdl, username, password, session_duration, ns)
